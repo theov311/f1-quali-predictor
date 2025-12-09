@@ -277,7 +277,7 @@ def index():
 @app.route('/api/years')
 def get_years():
     """Retourne les années disponibles pour la F1."""
-    years = list(range(2018, 2025))
+    years = list(range(2018, 2026))
     return jsonify(years)
 
 @app.route('/api/events/<int:year>')

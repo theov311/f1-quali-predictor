@@ -64,7 +64,7 @@ http://127.0.0.1:5000
 
 ## 📖 Utilisation
 
-1. Sélectionnez une **année** (2018-2024)
+1. Sélectionnez une **année** (2018-2025)
 2. Choisissez un **Grand Prix**
 3. Sélectionnez le **type de session** (Q1, Q2 ou Q3)
 4. Cliquez sur **"Prédire"**
@@ -106,7 +106,7 @@ f1-quali-predictor/
 ## ⚠️ Limitations
 
 - Nécessite des données FastF1 complètes
-- Fonctionne pour les saisons 2018-2024
+- Fonctionne pour les saisons 2018-2025
 - Prédictions basées sur des moyennes statistiques
 - Ne prend pas en compte la météo ou incidents en temps réel
 
