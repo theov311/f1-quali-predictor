@@ -290,7 +290,10 @@ def get_events(year):
         events = []
         for idx, event in schedule.iterrows():
             # Vérifier si l'événement a des sessions (pas de test ou événement spécial)
-            if pd.notna(event.get('EventName')) and pd.notna(event.get('RoundNumber')):
+            # Exclure Round 0 (Pre-Season Testing)
+            if (pd.notna(event.get('EventName')) and 
+                pd.notna(event.get('RoundNumber')) and 
+                event.get('RoundNumber') != 0):
                 events.append({
                     'round': int(event['RoundNumber']),
                     'name': event['EventName']
