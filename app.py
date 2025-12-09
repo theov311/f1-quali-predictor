@@ -3,7 +3,7 @@ import fastf1
 import pandas as pd
 import numpy as np
 from scipy import stats
-from datetime import timedelta
+from datetime import timedelta, datetime
 import traceback
 
 # Configuration de l'affichage et du cache
@@ -277,7 +277,8 @@ def index():
 @app.route('/api/years')
 def get_years():
     """Retourne les années disponibles pour la F1."""
-    years = list(range(2018, 2026))
+    current_year = datetime.now().year
+    years = list(range(2018, current_year + 2))
     return jsonify(years)
 
 @app.route('/api/events/<int:year>')
