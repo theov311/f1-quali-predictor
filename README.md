@@ -1,0 +1,133 @@
+# 🏁 Prédicteur de Qualifications F1
+
+Application web interactive pour prédire les résultats des qualifications de Formule 1 en temps réel.
+
+## 🎯 Fonctionnalités
+
+- **Prédiction intelligente** : Analyse basée sur les données FastF1
+- **3 types de sessions** : Q1, Q2, et Q3
+- **Calcul automatique** : Prédiction aux 2/3 de chaque session (moment optimal)
+- **Intervalle de confiance** : Fourchette de temps avec évolution de piste
+- **Interface moderne** : Design épuré et responsive
+
+## 📊 Comment ça marche ?
+
+L'algorithme se place aux **2/3 de la session** (après la 1ère tentative, avant la 2ème) et :
+
+1. Analyse les meilleurs tours de chaque pilote
+2. Identifie la "bulle" des pilotes en danger (pour Q1/Q2)
+3. Calcule un intervalle de prédiction statistique (t-Student)
+4. Applique un facteur d'évolution de piste pour le temps restant
+
+### Sessions détectées automatiquement
+
+- **Q1 (18 min)** : Prédiction à 12 min → Cutoff P15
+- **Q2 (15 min)** : Prédiction à 10 min → Cutoff P10
+- **Q3 (12 min)** : Prédiction à 8 min → Pole Position
+
+## 🚀 Installation
+
+### Prérequis
+- Python 3.8+
+- pip
+
+### Étapes
+
+1. **Cloner le repository**
+```bash
+git clone https://github.com/votre-username/f1-quali-predictor.git
+cd f1-quali-predictor
+```
+
+2. **Créer un environnement virtuel**
+```bash
+python -m venv .venv
+source .venv/bin/activate  # Sur Windows: .venv\Scripts\activate
+```
+
+3. **Installer les dépendances**
+```bash
+pip install -r requirements.txt
+```
+
+4. **Lancer l'application**
+```bash
+python app.py
+```
+
+5. **Ouvrir dans le navigateur**
+```
+http://127.0.0.1:5000
+```
+
+## 📖 Utilisation
+
+1. Sélectionnez une **année** (2018-2024)
+2. Choisissez un **Grand Prix**
+3. Sélectionnez le **type de session** (Q1, Q2 ou Q3)
+4. Cliquez sur **"Prédire"**
+5. Obtenez l'**intervalle de temps prédit** !
+
+## 🛠️ Technologies utilisées
+
+- **Backend** : Flask (Python)
+- **Données** : FastF1 API
+- **Analyse** : Pandas, NumPy, SciPy
+- **Frontend** : HTML, CSS, JavaScript (Vanilla)
+
+## 📁 Structure du projet
+
+```
+f1-quali-predictor/
+├── app.py                      # Application Flask principale
+├── f1_quali_predictor.py       # Script standalone (version CLI)
+├── templates/
+│   └── index.html              # Interface web
+├── cache/                      # Cache FastF1 (généré automatiquement)
+├── requirements.txt            # Dépendances Python
+├── .gitignore
+└── README.md
+```
+
+## 🔬 Algorithme de prédiction
+
+### Q1/Q2 - Cutoff Prediction
+- Utilise les pilotes dans la "bulle" (zone médiane/basse)
+- Calcul d'intervalle avec distribution t-Student
+- Facteur d'évolution : -0.03s par minute
+
+### Q3 - Pole Position
+- Compare le meilleur tour actuel
+- Calcule l'Ultimate Lap théorique (meilleurs secteurs)
+- Prédit entre ces deux valeurs avec évolution
+
+## ⚠️ Limitations
+
+- Nécessite des données FastF1 complètes
+- Fonctionne pour les saisons 2018-2024
+- Prédictions basées sur des moyennes statistiques
+- Ne prend pas en compte la météo ou incidents en temps réel
+
+## 🤝 Contribution
+
+Les contributions sont les bienvenues ! N'hésitez pas à :
+- Ouvrir des issues pour signaler des bugs
+- Proposer des améliorations
+- Soumettre des pull requests
+
+## 📝 License
+
+MIT License - Libre d'utilisation
+
+## 👨‍💻 Auteur
+
+Créé avec ❤️ pour les passionnés de F1
+
+## 🙏 Remerciements
+
+- [FastF1](https://github.com/theOehrly/Fast-F1) pour l'API de données
+- La communauté F1 pour l'inspiration
+
+---
+
+**Bon prédiction ! 🏎️💨**

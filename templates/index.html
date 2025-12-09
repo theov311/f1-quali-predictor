@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prédicteur de Qualifications F1</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+        }
+
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-top: 30px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .card h2 {
+            color: #667eea;
+            margin-bottom: 25px;
+            font-size: 1.5em;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 15px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+        }
+
+        select, input[type="number"], input[type="range"] {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: border-color 0.3s;
+        }
+
+        select:focus, input[type="number"]:focus, input[type="range"]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        input[type="range"] {
+            padding: 8px;
+            height: auto;
+        }
+
+        .range-display {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 8px;
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .range-value {
+            background: #f5f5f5;
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-weight: 600;
+            color: #667eea;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 30px;
+        }
+
+        button {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-predict {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-predict:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-predict:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-clear {
+            background: #f0f0f0;
+            color: #333;
+        }
+
+        .btn-clear:hover {
+            background: #e0e0e0;
+        }
+
+        .results-section {
+            background: #f9f9f9;
+            border-radius: 15px;
+            padding: 30px;
+            margin-top: 30px;
+            grid-column: 1 / -1;
+        }
+
+        .results-section h2 {
+            color: #667eea;
+            margin-bottom: 25px;
+            font-size: 1.5em;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 15px;
+        }
+
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .result-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+        }
+
+        .result-card h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 1.2em;
+        }
+
+        .result-item {
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .result-item:last-child {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+
+        .result-label {
+            color: #666;
+            font-size: 0.9em;
+            margin-bottom: 5px;
+        }
+
+        .result-value {
+            color: #333;
+            font-size: 1.1em;
+            font-weight: 600;
+        }
+
+        .result-value.time {
+            color: #667eea;
+            font-size: 1.3em;
+        }
+
+        .result-value.interval {
+            background: #f0f5ff;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+        }
+
+        .result-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .result-list li {
+            background: #f5f5f5;
+            padding: 8px 12px;
+            margin-bottom: 5px;
+            border-radius: 4px;
+            color: #333;
+        }
+
+        .error-message {
+            background: #fee;
+            color: #c33;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #c33;
+            margin-bottom: 20px;
+        }
+
+        .success-message {
+            background: #efe;
+            color: #3c3;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #3c3;
+            margin-bottom: 20px;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+
+            header h1 {
+                font-size: 1.8em;
+            }
+
+            .results-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🏁 Prédicteur de Qualifications F1</h1>
+            <p>Prédisez les résultats en temps réel pendant les qualifications</p>
+        </header>
+
+        <div class="main-content">
+            <div class="card">
+                <h2>⚙️ Configuration</h2>
+                <div class="form-group">
+                    <label for="year">Année:</label>
+                    <select id="year">
+                        <option value="">Sélectionner une année</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="event">Grand Prix:</label>
+                    <select id="event">
+                        <option value="">Sélectionner d'abord une année</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="sessionType">Type de Session:</label>
+                    <select id="sessionType">
+                        <option value="Q1">Q1 (Cutoff à P15)</option>
+                        <option value="Q2">Q2 (Cutoff à P10)</option>
+                        <option value="Q3">Q3 (Pole Position)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>⏱️ Paramètres de prédiction</h2>
+                <div class="form-group">
+                    <label for="sessionType">Type de Session:</label>
+                    <div style="background: #f5f5f5; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <span style="font-weight: 600; color: #667eea; font-size: 1.1em;" id="sessionInfo">Q1</span>
+                            <span style="color: #666;">Durée: <span style="font-weight: 600; color: #333;" id="sessionDuration">18</span> min</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>📍 Moment de prédiction</label>
+                    <div style="background: #e8f5e9; padding: 15px; border-radius: 8px; border-left: 4px solid #4caf50;">
+                        <div style="color: #2e7d32; font-weight: 600; margin-bottom: 8px;">
+                            ⏱️ Prédiction aux 2/3 de la session
+                        </div>
+                        <div style="font-size: 0.9em; color: #555; margin-bottom: 12px;">
+                            Moment optimal : après la 1ère tentative, avant la 2ème
+                        </div>
+                        <div class="range-display" style="margin-top: 10px;">
+                            <div style="flex: 1;">
+                                <div style="background: white; padding: 10px; border-radius: 6px; text-align: center;">
+                                    <div style="font-size: 0.85em; color: #666; margin-bottom: 5px;">Temps écoulé</div>
+                                    <div style="font-size: 1.3em; font-weight: 600; color: #667eea;"><span id="simTimeValue">12</span> min</div>
+                                </div>
+                            </div>
+                            <div style="flex: 1; margin-left: 10px;">
+                                <div style="background: white; padding: 10px; border-radius: 6px; text-align: center;">
+                                    <div style="font-size: 0.85em; color: #666; margin-bottom: 5px;">Temps restant</div>
+                                    <div style="font-size: 1.3em; font-weight: 600; color: #764ba2;"><span id="timeRemValue">6</span> min</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="button-group">
+                    <button class="btn-predict" id="predictBtn" disabled>🔮 Prédire</button>
+                    <button class="btn-clear" id="clearBtn">🗑️ Réinitialiser</button>
+                </div>
+            </div>
+
+            <div class="results-section">
+                <div id="loadingIndicator" class="loading">
+                    <div class="spinner"></div>
+                    <p>Chargement des données...</p>
+                </div>
+                <div id="results"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const yearSelect = document.getElementById('year');
+        const eventSelect = document.getElementById('event');
+        const sessionTypeSelect = document.getElementById('sessionType');
+        const predictBtn = document.getElementById('predictBtn');
+        const clearBtn = document.getElementById('clearBtn');
+        const resultsDiv = document.getElementById('results');
+        const loadingIndicator = document.getElementById('loadingIndicator');
+        const simTimeValue = document.getElementById('simTimeValue');
+        const timeRemValue = document.getElementById('timeRemValue');
+        const sessionInfo = document.getElementById('sessionInfo');
+        const sessionDuration = document.getElementById('sessionDuration');
+
+        // Configuration des sessions
+        const sessionConfig = {
+            'Q1': { duration: 18, name: 'Q1' },
+            'Q2': { duration: 15, name: 'Q2' },
+            'Q3': { duration: 12, name: 'Q3' }
+        };
+
+        // Variable pour stocker les temps calculés
+        let currentSimulationTime = 12;
+        let currentTimeRemaining = 6;
+
+        // Charger les années
+        async function loadYears() {
+            try {
+                const response = await fetch('/api/years');
+                const years = await response.json();
+                years.forEach(year => {
+                    const option = document.createElement('option');
+                    option.value = year;
+                    option.textContent = year;
+                    yearSelect.appendChild(option);
+                });
+            } catch (error) {
+                showError('Erreur lors du chargement des années');
+            }
+        }
+
+        // Mettre à jour les paramètres de session basé sur le type de Q
+        sessionTypeSelect.addEventListener('change', () => {
+            updateSessionTiming();
+        });
+
+        function updateSessionTiming() {
+            const sessionType = sessionTypeSelect.value;
+            const config = sessionConfig[sessionType];
+            
+            // Calculer les 2/3 de la session
+            const twoThirds = Math.round((config.duration * 2) / 3);
+            currentSimulationTime = twoThirds;
+            currentTimeRemaining = config.duration - twoThirds;
+            
+            // Mettre à jour l'affichage
+            sessionInfo.textContent = config.name;
+            sessionDuration.textContent = config.duration;
+            simTimeValue.textContent = currentSimulationTime;
+            timeRemValue.textContent = currentTimeRemaining;
+        }
+
+        // Charger les événements
+        yearSelect.addEventListener('change', async () => {
+            eventSelect.innerHTML = '<option value="">Sélectionner un Grand Prix</option>';
+            predictBtn.disabled = true;
+
+            if (!yearSelect.value) return;
+
+            loadingIndicator.style.display = 'block';
+            try {
+                const response = await fetch(`/api/events/${yearSelect.value}`);
+                const events = await response.json();
+                events.forEach(event => {
+                    const option = document.createElement('option');
+                    option.value = event.name;
+                    option.textContent = `R${event.round} - ${event.name}`;
+                    eventSelect.appendChild(option);
+                });
+            } catch (error) {
+                showError('Erreur lors du chargement des événements');
+            } finally {
+                loadingIndicator.style.display = 'none';
+            }
+        });
+
+        // Activer le bouton prédire
+        eventSelect.addEventListener('change', async () => {
+            predictBtn.disabled = !eventSelect.value;
+            resultsDiv.innerHTML = '';
+
+            if (!eventSelect.value) return;
+
+            loadingIndicator.style.display = 'block';
+            try {
+                const response = await fetch(`/api/session-info/${yearSelect.value}/${eventSelect.value}`);
+                if (!response.ok) throw new Error('Erreur lors du chargement de la session');
+                const info = await response.json();
+                console.log('Session info loaded:', info);
+            } catch (error) {
+                showError('Erreur lors du chargement des informations de session');
+                predictBtn.disabled = true;
+            } finally {
+                loadingIndicator.style.display = 'none';
+            }
+        });
+
+        // Prédire
+        predictBtn.addEventListener('click', async () => {
+            loadingIndicator.style.display = 'block';
+            resultsDiv.innerHTML = '';
+
+            try {
+                const response = await fetch('/api/predict', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        year: parseInt(yearSelect.value),
+                        event: eventSelect.value,
+                        simulation_time: currentSimulationTime,
+                        time_remaining: currentTimeRemaining,
+                        session_type: sessionTypeSelect.value
+                    })
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    showError(error.error || 'Erreur lors de la prédiction');
+                    return;
+                }
+
+                const result = await response.json();
+                displayResults(result, currentTimeRemaining);
+            } catch (error) {
+                showError(error.message || 'Erreur lors de la prédiction');
+            } finally {
+                loadingIndicator.style.display = 'none';
+            }
+        });
+
+        // Réinitialiser
+        clearBtn.addEventListener('click', () => {
+            yearSelect.value = '';
+            eventSelect.innerHTML = '<option value="">Sélectionner un Grand Prix</option>';
+            sessionTypeSelect.value = 'Q1';
+            resultsDiv.innerHTML = '';
+            predictBtn.disabled = true;
+            updateSessionTiming();
+        });
+
+        function showError(message) {
+            resultsDiv.innerHTML = `<div class="error-message">❌ ${message}</div>`;
+        }
+
+        function displayResults(data, timeRemainingValue) {
+            if (!data.success && data.error) {
+                showError(data.error);
+                return;
+            }
+
+            let html = '';
+
+            // Afficher uniquement l'intervalle prédit
+            if (data['Intervalle Prédit']) {
+                const interval = data['Intervalle Prédit'];
+                html += `
+                    <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 30px; border-radius: 15px; text-align: center; box-shadow: 0 10px 40px rgba(102, 126, 234, 0.3);">
+                        <div style="color: white; font-size: 0.9em; margin-bottom: 10px; opacity: 0.9;">
+                            🎯 ${data.Cible || data['Cible']}
+                        </div>
+                        <div style="color: white; font-size: 0.85em; margin-bottom: 15px; opacity: 0.8;">
+                            
+                        </div>
+                        <div style="background: rgba(255,255,255,0.2); padding: 20px; border-radius: 10px; backdrop-filter: blur(10px);">
+                            <div style="color: white; font-size: 2.5em; font-weight: 700; font-family: 'Courier New', monospace;">
+                                ${formatTime(interval[0])} - ${formatTime(interval[1])}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            resultsDiv.innerHTML = html;
+        }
+
+        function formatTime(seconds) {
+            if (!seconds) return 'N/A';
+            const mins = Math.floor(seconds / 60);
+            const secs = (seconds % 60).toFixed(3);
+            return `${mins}:${secs.padStart(6, '0')}`;
+        }
+
+        // Initialiser
+        loadYears();
+        updateSessionTiming();
+    </script>
+</body>
+</html>
