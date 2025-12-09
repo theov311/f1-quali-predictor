@@ -2,6 +2,8 @@
 
 Application web interactive pour prédire les résultats des qualifications de Formule 1 en temps réel.
 
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/theov311/f1-quali-predictor)
+
 ## 🎯 Fonctionnalités
 
 - **Prédiction intelligente** : Analyse basée sur les données FastF1
