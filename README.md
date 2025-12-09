@@ -108,6 +108,34 @@ f1-quali-predictor/
 - Prédictions basées sur des moyennes statistiques
 - Ne prend pas en compte la météo ou incidents en temps réel
 
+## 🌐 Déploiement
+
+### Option 1 : Render.com (Gratuit - Recommandé) ⭐
+
+1. Créez un compte sur [Render.com](https://render.com)
+2. Cliquez sur "New +" → "Web Service"
+3. Connectez votre repository GitHub `theov311/f1-quali-predictor`
+4. Render détectera automatiquement la configuration (`render.yaml`)
+5. Cliquez sur "Create Web Service"
+6. Votre app sera disponible sur `https://f1-quali-predictor.onrender.com`
+
+⚠️ **Note** : Le service gratuit se met en veille après 15 minutes d'inactivité. Le premier chargement peut prendre 30-60 secondes.
+
+### Option 2 : Railway.app
+
+1. Créez un compte sur [Railway.app](https://railway.app)
+2. "New Project" → "Deploy from GitHub repo"
+3. Sélectionnez `theov311/f1-quali-predictor`
+4. Railway détectera Flask automatiquement
+5. Ajoutez la commande de démarrage : `gunicorn app:app`
+
+### Option 3 : PythonAnywhere
+
+1. Compte gratuit sur [PythonAnywhere](https://www.pythonanywhere.com)
+2. Clonez votre repo : `git clone https://github.com/theov311/f1-quali-predictor.git`
+3. Créez un environnement virtuel et installez les dépendances
+4. Configurez une Web App Flask dans l'onglet "Web"
+
 ## 🤝 Contribution
 
 Les contributions sont les bienvenues ! N'hésitez pas à :
